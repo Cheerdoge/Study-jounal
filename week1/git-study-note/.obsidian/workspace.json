@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "git.md",
+                "file": "store's-init-and-file's-add-and-commit.md",
                 "mode": "source",
-                "source": true
+                "source": false
               },
               "icon": "lucide-file",
-              "title": "git"
+              "title": "store's-init-and-file's-add-and-commit"
             }
           }
         ]
@@ -98,8 +98,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "5e4079d696f00bfb",
