@@ -4,42 +4,45 @@
     "type": "split",
     "children": [
       {
-        "id": "b9768cfb147c33c2",
+        "id": "a4f6521a433a3837",
         "type": "tabs",
         "children": [
           {
-            "id": "25f84678312189d0",
+            "id": "ab2deffb666b77eb",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "store's-init-and-file's-add-and-commit.md",
+                "file": "remain-git-study-note.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "store's-init-and-file's-add-and-commit"
-            }
+              "title": "remain-git-study-note"
+            },
+            "group": "5880e4bb9e0f5477"
           }
         ]
       },
       {
-        "id": "b95835518767f710",
+        "id": "2ed1df3982b2ca0f",
         "type": "tabs",
         "children": [
           {
-            "id": "991b4674cb6208d1",
+            "id": "ae4af167261f2e13",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "outline",
               "state": {
-                "file": "git.md",
-                "mode": "source",
-                "source": false
+                "file": "remain-git-study-note.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
-              "icon": "lucide-file",
-              "title": "git"
-            }
+              "icon": "lucide-list",
+              "title": "remain-git-study-note 的大纲"
+            },
+            "group": "5880e4bb9e0f5477"
           }
         ]
       }
@@ -189,13 +192,16 @@
       "bases:创建新数据库": false
     }
   },
-  "active": "25f84678312189d0",
+  "active": "ae4af167261f2e13",
   "lastOpenFiles": [
+    "store's-init-and-file's-add-and-commit.md",
+    "remain-git-study-note.md",
+    "gitignore2.png",
+    "gitignore.png",
     "git-reset.png",
-    "git.md",
+    "git-rm.png",
     "屏幕截图 2025-11-02 095533.png",
     "屏幕截图.md",
-    "store's-init-and-file's-add-and-commit.md",
     "未命名"
   ]
 }

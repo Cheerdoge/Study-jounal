@@ -11,4 +11,6 @@
     4. `git add .`可将当前文件夹下的所有文件提交暂存区中
 * `git commit`可用于提交暂存区的文件，且仅会提交暂存区文件
    * 在命令后加-m 可以添加提交的信息，如fix等，详见standardized-commits-in-git
+   * -a可以一次完成提交和保存
+   * -a -m可简写为-am
 * `git log`可查看提交记录，其后加上`--oneline`可查看简洁的提交记录
