@@ -58,7 +58,7 @@
 
 ## 检测通道阻塞或被关闭
 1. if大人来了`if v,ok := <-ch; ok{}`
-2. 如果是在for循环中，就可以用条件增加一个breakv
+2. 如果是在for循环中，就可以用条件增加一个break
 3. `select`语句用于检测是否阻塞
   ```go
    select {
@@ -87,3 +87,51 @@ default: // no value ready to be received
 ```
 哪个好了执行哪个下面的语句，default是在都没好时执行的
 可以配合`time.After()`实现超时通知
+package main
+
+import "fmt"
+
+func main() {
+    letterTurn := make(chan struct{}, 1) // 令牌：轮到字母
+    numberTurn := make(chan struct{}, 1) // 令牌：轮到数字
+    done := make(chan struct{})
+
+    letters := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+    // 字母协程：每次打印2个字母，然后交棒给数字
+    go func() {
+        defer close(numberTurn) // 字母全部打印完，关闭以通知数字退出
+        i := 0
+        for i < len(letters) {
+            <-letterTurn
+            for k := 0; k < 2 && i < len(letters); k++ {
+                fmt.Printf("%c", letters[i])
+                i++
+            }
+            numberTurn <- struct{}{}
+        }
+    }()
+
+    // 数字协程：每次打印2个数字(0-9循环)，然后交棒给字母
+    go func() {
+        defer close(done)
+        n := 0
+        for {
+            _, ok := <-numberTurn
+            if !ok {
+                return // 字母已结束且不再交棒
+            }
+            for k := 0; k < 2; k++ {
+                fmt.Printf("%d", n%10)
+                n++
+            }
+            // 使用带缓冲令牌，最后一次发送不会阻塞
+            letterTurn <- struct{}{}
+        }
+    }()
+
+    // 先让字母开始
+    letterTurn <- struct{}{}
+    <-done
+    fmt.Println()
+}
