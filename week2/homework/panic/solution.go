@@ -60,10 +60,11 @@ func main() {
 		// 如果数量达到额定值就批量消费
 		if len(consumeMSG) >= ConsumeNum {
 			//进行异步消费
+			m := make([]MSG, ConsumeNum)
+			copy(m, consumeMSG[:ConsumeNum])
 			go func() {
 				//m := consumeMSG[:ConsumeNum]
-				m := make([]MSG, ConsumeNum)
-				copy(m, consumeMSG[:ConsumeNum])
+
 				fn(m)
 			}()
 			// 更新上次消费时间
@@ -74,16 +75,16 @@ func main() {
 			// 如果距离上次消费已经超过5分钟且有未处理的消息
 			if len(consumeMSG) > 0 {
 				//进行异步消费
+				m := make([]MSG, ConsumeNum)
+				copy(m, consumeMSG[:])
 				go func() {
 					//m := consumeMSG[:ConsumeNum]
-					m := make([]MSG, ConsumeNum)
-					copy(m, consumeMSG[:])
 					fn(m)
 				}()
 				// 更新上次消费时间
 				lastConsumeTime = time.Now()
 				// 清空插入的数据
-				consumeMSG = consumeMSG[ConsumeNum:]
+				consumeMSG = consumeMSG[len(consumeMSG):]
 			}
 		}
 	}
