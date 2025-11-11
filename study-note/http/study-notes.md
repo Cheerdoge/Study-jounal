@@ -90,5 +90,12 @@ JavaScript对象表示法，一种轻量级文本数据交换格式
 * 反序列化（UnMarshal）：...
 ### go程序中使用json
  导入包`encoding/json`
-1. 序列化练习
+ 1. `json.Marshal()` 的函数签名是 `func Marshal(v interface{}) ([]byte, error)`返回的实际是一个字节切片，而error用作错误处理
+    在web中原函数名加个forHTML
+    转换后更好读的形式加Indent，该函数有两个额外的字符串参数用于表示每一行输出的前缀和每一个层级的缩进
+ 2. `UnMarshal()` 的函数签名是 `func Unmarshal(data []byte, v interface{}) error`
+    可以用map（未知json数据）或者结构体（提前知道json数据）来接
+	 1. 其中结构体的可以在类型后再加数据用来表示在json中的名字
+	 2. map的定义key为string，值为interface{}，接收数据要用一个接口变量
+	 3. 使用类型断言访问这个数据`m := f.(map[string]interface{})`
 # go中构建http请求
