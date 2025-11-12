@@ -17,13 +17,15 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(req)
+	// fmt.Println(req)
 
 	// write your code below
 	resp, err := req.SendRequest()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	resp.ShowHeader()
+	resp.ShowBody()
 }

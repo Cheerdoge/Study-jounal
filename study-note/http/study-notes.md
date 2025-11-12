@@ -99,3 +99,7 @@ JavaScript对象表示法，一种轻量级文本数据交换格式
 	 2. map的定义key为string，值为interface{}，接收数据要用一个接口变量
 	 3. 使用类型断言访问这个数据`m := f.(map[string]interface{})`
 # go中构建http请求
+https://gtainmuxi.muxixyz.com/api/v1/organization/code
+http://http-theft-bank.gtainccnu.muxixyz.com/api/v1/organization/secret_key
+http://http-theft-bank.gtainccnu.muxixyz.com/api/v1/bank/gate
+http://http-theft-bank.gtainccnu.muxixyz.com/api/v1/bank/iris_recognition_gate
