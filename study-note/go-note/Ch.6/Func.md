@@ -18,3 +18,34 @@
 7. 闭包中使用的变量会一直保留到最后一个闭包引用完毕，没有被闭包引用的局部变量会在当前函数返回后被回收
 8. **闭包内的变量不会被保留状态** 
 9. 学会**避免重复计算** 来优化性能，例如斐波那契数列用闭包而不是递归，因为闭包每次计算都是原本没有的值
+10. 可以通过设定一个函数变量，来实现命名的函数闭包
+```go
+var dowork func(int)
+
+    dowork = func(count int) {
+
+        if count == len(nums) {
+
+            value := make([]int, len(nums))
+
+            copy(value, nums)
+
+            result = append(result, value)
+
+        }
+
+        for i := count; i < len(nums); i++ {
+
+            nums[count], nums[i] = nums[i], nums[count]
+
+            dowork(count + 1)
+
+            nums[count], nums[i] = nums[i], nums[count]
+
+        }
+
+    }
+
+ 
+```
+11. 递归函数的条件如果是全局变量，且一次递归指向了多个递归函数（全排列），会导致混乱程序崩溃
