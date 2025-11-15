@@ -7,7 +7,7 @@ import (
 
 type Address struct {
 	Type    string
-	City    string `json:"Address"`
+	City    string `json:"Address"` //可以在序列化时修改字段名，按这样子
 	Country string
 }
 
