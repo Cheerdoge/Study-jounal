@@ -9,4 +9,5 @@ key必须是字符串（？）
 
 # 取出
 `number := ctx.Value("key").(type)`
-由于取出来的值是个接口类型，我们需要进行类型判断
+**由于取出来的值是个接口类型，我们需要进行类型判断**
+`username := r.Context().Value("username").(string)`

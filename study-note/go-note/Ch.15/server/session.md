@@ -132,7 +132,7 @@ type Cookie struct {
 ```
 
 ## 设置Cookie
-使用`http.SetCookie(w &http.Cookie{})`函数设置
+使用`http.SetCookie(w, &http.Cookie{})`函数设置
 直接在括号内cookie结构体的花括号内填写即可
 
 ## 删除Cookie
