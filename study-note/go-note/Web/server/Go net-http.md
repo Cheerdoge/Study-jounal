@@ -17,12 +17,12 @@
 ---
 
 ## 服务器启动与配置
-| 函数 / 类型 | 所属 / 位置 | 作用 / 常用场景 | 注意点 |
-|---|---:|---|---|
-| http.ListenAndServe(addr, handler) | 包级 | 在 addr 上启动 HTTP 服务（阻塞） | 例：`http.ListenAndServe(":8080", mux)` |
-| http.ListenAndServeTLS(addr, certFile, keyFile, handler) | 包级 | 启动 HTTPS | 需要证书与私钥文件 |
-| &http.Server{...} / Server.Shutdown(ctx) | 类型/方法 | 更细粒度配置与优雅关机 | 用于 graceful shutdown |
-| http.TimeoutHandler(h, timeout, msg) | 包级 | 给单个 handler 设置超时 | 超时后自动返回 503 或自定义 msg |
+| 函数 / 类型                                                  | 所属 / 位置 | 作用 / 常用场景              | 注意点                                   |
+| -------------------------------------------------------- | ------: | ---------------------- | ------------------------------------- |
+| http.ListenAndServe(addr, handler)                       |      包级 | 在 addr 上启动 HTTP 服务（阻塞） | 例：`http.ListenAndServe(":8080", mux)` |
+| http.ListenAndServeTLS(addr, certFile, keyFile, handler) |      包级 | 启动 HTTPS               | 需要证书与私钥文件                             |
+| &http.Server{...} / Server.Shutdown(ctx)                 |   类型/方法 | 更细粒度配置与优雅关机            | 用于 graceful shutdown                  |
+| http.TimeoutHandler(h, timeout, msg)                     |      包级 | 给单个 handler 设置超时       | 超时后自动返回 503 或自定义 msg                  |
 
 ---
 
