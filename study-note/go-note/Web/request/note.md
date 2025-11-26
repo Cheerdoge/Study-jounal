@@ -29,8 +29,15 @@ resp内成员StatusCode可以获取，对其进行处理
 1. 解析为能够阅读的源码
 	`ioutil.ReadAll(resp.Body)`
 	返回的值为字节切片，需要进行类型转换
-2. 获取需要的内容
+2. 快速寻找需要的字段
+	Ctrl+F
+	- `action=` - 找到表单提交目标
+	- `name="lt"` - 找到一次性令牌
+	- `name="execution"` - 找到执行参数
+	- `hidden` - 找到所有隐藏字段
+3. 获取需要的内容
 	使用正则表达式: [笔记](study-note/go-note/package/regexp/regexp.md)
+	
 
 # 读取响应头
 响应头是元素为字符串切片的字典
