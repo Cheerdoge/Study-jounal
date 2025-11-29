@@ -7,16 +7,22 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
+	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 type User struct {
-	StudentID string `json:"id"`
-	Name      string `json:"name"`
-	Grade     string `json:"pid"`
+	LStudentID string `json:"id"`
+	PStudentID string
+	Name       string `json:"name"`
+	Grade      string `json:"Pid"`
 }
+
+var wg sync.WaitGroup
 
 func main() {
 	//输入用户名密码
@@ -131,45 +137,77 @@ func main() {
 	// fmt.Println(string(body))
 
 	//第三次请求，查询
-	serchurl := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/data/searchAccount.aspx"
+	key := make(chan struct{}, 20)
+	for i := 0; i < 20; i++ {
+		key <- struct{}{}
+	}
 
-	paydata := url.Values{}
-	paydata.Set("type", "logonname")
-	paydata.Set("ReservaApply", "ReservaApply")
-	paydata.Set("term", "2025000000")
-	paydata.Set("_", "1764209114550") //这个好像写什么都行
-
-	req, err = http.NewRequest("GET", serchurl+"?"+paydata.Encode(), nil)
+	f, err := os.Create("result.txt")
 	if err != nil {
-		fmt.Println("创建请求失败:", err)
+		fmt.Println("创建文件失败:", err)
 		return
 	}
 
-	resp, err = client.Do(req)
-	if err != nil {
-		fmt.Println("发送请求失败:", err)
-		return
-	}
-	defer resp.Body.Close()
+	var mu sync.Mutex
 
-	fmt.Println("查询请求状态码:", resp.StatusCode)
+	for i := 2025000000; i < 2026000000; i += 200 {
+		wg.Add(1)
+		go func(start int) {
+			<-key
+			defer func() { key <- struct{}{} }()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("读取响应体失败:", err)
-		return
-	}
-	fmt.Println(string(body)) //数组[{"id":"ID","Pid": "校园卡号","name": "名字","label": "名字","szLogonName": "xxxx","szHandPhone": "","szTel": "","szEmail": ""}]
+			defer wg.Done()
 
-	var user []User
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		fmt.Println("解析JSON失败:", err)
-		return
+			end := start + 200
+
+			for i := start; i < end; i++ {
+				serchurl := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/data/searchAccount.aspx"
+				term := strconv.Itoa(i)
+				// fmt.Println(term)
+				paydata := url.Values{}
+				paydata.Set("type", "logonname")
+				paydata.Set("ReservaApply", "ReservaApply")
+				paydata.Set("term", term)
+				paydata.Set("_", "1764209114550") //这个好像写什么都行
+				paydataStr := paydata.Encode()
+
+				req, err := http.NewRequest("GET", serchurl+"?"+paydataStr, nil)
+				if err != nil {
+					fmt.Println("创建请求失败:", err)
+					return
+				}
+
+				resp, err := client.Do(req)
+				if err != nil {
+					fmt.Println("发送请求失败:", err)
+					return
+				}
+
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					fmt.Println("读取响应体失败:", err)
+					return
+				}
+				resp.Body.Close()
+				//fmt.Println(string(body)) 数组[{"id":"ID","Pid": "校园卡号","name": "名字","label": "名字","szLogonName": "xxxx","szHandPhone": "","szTel": "","szEmail": ""}]
+
+				var user []User
+				err = json.Unmarshal(body, &user)
+				if err != nil {
+					fmt.Println("解析JSON失败:", err)
+					return
+				}
+				if len(user) != 0 {
+					// fmt.Println("查询请求状态码:", resp.StatusCode)
+					user[0].PStudentID = term
+					fmt.Println(user)
+					mu.Lock()
+					f.WriteString(fmt.Sprintf("Name: %s, LStudentID: %s, PStudentID: %s, Grade: %s级\n", user[0].Name, user[0].LStudentID, user[0].PStudentID, user[0].Grade[0:4]))
+					mu.Unlock()
+				}
+			}
+		}(i)
 	}
-	fmt.Println(user)
-	fmt.Println(len(user))
-	if len(user) != 0 {
-		fmt.Println(user)
-	}
+	wg.Wait()
+	f.Close()
 }

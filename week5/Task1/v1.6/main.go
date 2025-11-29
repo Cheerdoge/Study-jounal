@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -17,6 +19,8 @@ type User struct {
 	Name      string `json:"name"`
 	Grade     string `json:"pid"`
 }
+
+var wg sync.WaitGroup
 
 func main() {
 	//输入用户名密码
@@ -133,43 +137,60 @@ func main() {
 	//第三次请求，查询
 	serchurl := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/data/searchAccount.aspx"
 
-	paydata := url.Values{}
-	paydata.Set("type", "logonname")
-	paydata.Set("ReservaApply", "ReservaApply")
-	paydata.Set("term", "2025000000")
-	paydata.Set("_", "1764209114550") //这个好像写什么都行
+	ch := make(chan string, 200)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 2025000000; i <= 2025999999; i++ {
+			term := strconv.Itoa(i)
+			// fmt.Println(term)
+			paydata := url.Values{}
+			paydata.Set("type", "logonname")
+			paydata.Set("ReservaApply", "ReservaApply")
+			paydata.Set("term", term)
+			paydata.Set("_", "1764209114550") //这个好像写什么都行
+			ch <- paydata.Encode()
+		}
+		close(ch)
+	}()
 
-	req, err = http.NewRequest("GET", serchurl+"?"+paydata.Encode(), nil)
-	if err != nil {
-		fmt.Println("创建请求失败:", err)
-		return
-	}
+	wg.Add(5)
+	for i := 0; i < 5; i++ {
+		go func() {
+			defer wg.Done()
+			for paydataStr := range ch {
+				req, err := http.NewRequest("GET", serchurl+"?"+paydataStr, nil)
+				if err != nil {
+					fmt.Println("创建请求失败:", err)
+					return
+				}
 
-	resp, err = client.Do(req)
-	if err != nil {
-		fmt.Println("发送请求失败:", err)
-		return
-	}
-	defer resp.Body.Close()
+				resp, err := client.Do(req)
+				if err != nil {
+					fmt.Println("发送请求失败:", err)
+					return
+				}
+				defer resp.Body.Close()
 
-	fmt.Println("查询请求状态码:", resp.StatusCode)
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					fmt.Println("读取响应体失败:", err)
+					return
+				}
+				//fmt.Println(string(body)) 数组[{"id":"ID","Pid": "校园卡号","name": "名字","label": "名字","szLogonName": "xxxx","szHandPhone": "","szTel": "","szEmail": ""}]
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("读取响应体失败:", err)
-		return
+				var user []User
+				err = json.Unmarshal(body, &user)
+				if err != nil {
+					fmt.Println("解析JSON失败:", err)
+					return
+				}
+				if len(user) != 0 {
+					fmt.Println("查询请求状态码:", resp.StatusCode)
+					fmt.Printf("Name: %s, StudentID: %s, Grade: %s级\n", user[0].Name, user[0].StudentID, user[0].Grade[0:4])
+				}
+			}
+		}()
 	}
-	fmt.Println(string(body)) //数组[{"id":"ID","Pid": "校园卡号","name": "名字","label": "名字","szLogonName": "xxxx","szHandPhone": "","szTel": "","szEmail": ""}]
-
-	var user []User
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		fmt.Println("解析JSON失败:", err)
-		return
-	}
-	fmt.Println(user)
-	fmt.Println(len(user))
-	if len(user) != 0 {
-		fmt.Println(user)
-	}
+	wg.Wait()
 }
