@@ -81,7 +81,9 @@ rm -r Dir/	# 删除Dir文件夹（正确，对文件夹操作一定要带-r）
 ## mkdir用法
 mkdir newDir/	# 在当前路径创建一个空文件夹newDir/
 ```
+- **`-p` 或 `--parents`**：这是最有用的参数之一。它允许你**递归创建多级目录**。如果路径中的上级目录不存在，它会自动创建；如果目录已存在，也不会报错。例如，`mkdir -p project/src/utils` 会一次性创建整个目录链。
 
+- **`-m` 或 `--mode`**：在创建目录时直接**设置权限模式**，而不是使用默认的 `777` 减 `umask` 的计算结果。例如，创建一个仅拥有者可读写的目录：`mkdir -m 700 private_dir`。
 ### 8. rmdir：删除文件夹（Remove Directory）
 
 ```python

@@ -66,6 +66,12 @@
 `docker save [OPTIONS] IMAGE.tar [IMAGE...]`
 - **`-o, --output`**: 指定输出文件的路径。
 
+### cp
+`docker cp [OPTIONS] SRC_PATH CONTAINER:DEST_PATH`
+`docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH`
+- **`RC_PATH`**: 源路径（可以是容器内的路径或宿主机的路径）。
+- **`CONTAINER`**: 容器的名称或 ID。
+- **`DEST_PATH`**: 目标路径（可以是容器内的路径或宿主机的路径）。
 ## compose
 默认先查找docker-compose.yml或.yaml文件然后执行
 
