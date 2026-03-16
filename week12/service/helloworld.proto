@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package hello_grpc;
+
+option go_package = "./hello_grpc";
+
+//定义rpc服务
+service HelloService {
+    //定义rpc方法
+  rpc SayHello (HelloRequest) returns (HelloResponse){};
+}
+
+// 定义请求消息
+message HelloRequest {
+    string name = 1;
+    string message = 2;
+}
+
+// 定义响应消息
+message HelloResponse {
+    string name = 1;
+    string message = 2;
+}
