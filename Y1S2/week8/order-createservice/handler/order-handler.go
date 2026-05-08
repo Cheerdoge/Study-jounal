@@ -37,6 +37,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		log.Printf("Failed to create order: %v", err)
 		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{"message": "Order created successfully"})
 
 }

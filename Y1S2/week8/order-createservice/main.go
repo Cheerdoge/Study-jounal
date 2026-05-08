@@ -19,8 +19,13 @@ func main() {
 	}
 	defer config.CloseDatabase(db)
 
+	if err := config.NewKafkaPublisher(); err != nil {
+		log.Fatalf("Failed to create Kafka publisher: %v", err)
+	}
+	defer config.Publisher.Close()
+
 	orderrepository := repository.NewOrderRepository(db)
-	orderservice := service.NewOrderService(orderrepository)
+	orderservice := service.NewOrderService(orderrepository, config.Publisher)
 	orderhandler := handler.NewOrderHandler(orderservice)
 	r := gin.Default()
 	router.RegisterRoutes(r, orderhandler)

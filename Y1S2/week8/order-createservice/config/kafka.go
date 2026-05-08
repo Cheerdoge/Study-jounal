@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log"
+
 	"github.com/IBM/sarama"
 )
 
@@ -8,22 +10,25 @@ type KafkaPublisher struct {
 	producer sarama.SyncProducer
 }
 
-func NewKafkaPublisher(brokers []string, clientID string) (*KafkaPublisher, error) {
+var Publisher *KafkaPublisher
+
+func NewKafkaPublisher() error {
 	config := sarama.NewConfig()
 	config.Version = sarama.V4_2_0_0
-	config.ClientID = clientID
+	config.ClientID = "order-service-producer"
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
 	config.Producer.Return.Successes = true
 	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	config.Consumer.Offsets.AutoCommit.Enable = false
 
-	producer, err := sarama.NewSyncProducer(brokers, config)
+	producer, err := sarama.NewSyncProducer([]string{"127.0.0.1:9092"}, config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &KafkaPublisher{producer: producer}, nil
+	Publisher = &KafkaPublisher{producer: producer}
+	return nil
 }
 
 func (kp *KafkaPublisher) Publish(topic string, key, value []byte) error {
@@ -32,10 +37,11 @@ func (kp *KafkaPublisher) Publish(topic string, key, value []byte) error {
 		Key:   sarama.ByteEncoder(key),
 		Value: sarama.ByteEncoder(value),
 	}
-	_, _, err := kp.producer.SendMessage(msg)
+	partition, offset, err := kp.producer.SendMessage(msg)
 	if err != nil {
 		return err
 	}
+	log.Printf("Message sent to topic %s, partition %d at offset %d", topic, partition, offset)
 	return nil
 }
 
