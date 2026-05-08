@@ -17,3 +17,11 @@ func NewOrderRepository(db *gorm.DB) *OrderRepository {
 func (r *OrderRepository) CreateOrder(order *model.Order) error {
 	return r.db.Create(order).Error
 }
+
+func (r *OrderRepository) GetOrderByID(id uint) (*model.Order, error) {
+	var order model.Order
+	if err := r.db.First(&order, id).Error; err != nil {
+		return nil, err
+	}
+	return &order, nil
+}

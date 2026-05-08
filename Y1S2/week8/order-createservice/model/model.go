@@ -1,7 +1,8 @@
 package model
 
 type Order struct {
-	ID     string `gorm:"primaryKey"`
+	ID     uint `gorm:"primaryKey"`
+	UserID uint
 	Item   string
 	Status string
 }
