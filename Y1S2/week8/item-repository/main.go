@@ -5,11 +5,14 @@ import (
 	"item-repository/config"
 	"item-repository/handler"
 	"item-repository/repository"
+	"item-repository/router"
 	"item-repository/service"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -23,7 +26,16 @@ func main() {
 
 	repo := repository.NewInventoryRepository(db)
 	svc := service.NewItemService(repo)
-	kafkaHandler := handler.NewKafkaHandler(svc)
+	handler := handler.NewInventoryHandler(svc)
+
+	r := gin.Default()
+	router.RegisterRoutes(r, handler)
+	log.Println("Starting HTTP server on :8090")
+	go func() {
+		if err := r.Run(":8090"); err != nil {
+			log.Fatalf("Failed to run HTTP server: %v", err)
+		}
+	}()
 
 	consumerGroup, err := config.NewKafkaConsumer()
 	if err != nil {
@@ -38,7 +50,7 @@ func main() {
 	go func() {
 		for {
 			log.Printf("Starting Kafka consumer for topics: %v", topics)
-			if err := consumerGroup.Consume(ctx, topics, kafkaHandler); err != nil {
+			if err := consumerGroup.Consume(ctx, topics, handler); err != nil {
 				log.Printf("Error consuming messages: %v", err)
 			}
 			if ctx.Err() != nil {

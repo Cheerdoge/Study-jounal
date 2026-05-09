@@ -15,7 +15,7 @@ type InventoryService interface {
 	ProcessOrder(orderID uint, itemname string, nums int) error
 }
 
-type KafkaHandler struct {
+type InventoryHandler struct {
 	Service InventoryService
 }
 
@@ -26,21 +26,21 @@ type OrderMessage struct {
 	Nums     int    `json:"nums"`
 }
 
-func NewKafkaHandler(service InventoryService) *KafkaHandler {
-	return &KafkaHandler{
+func NewInventoryHandler(service InventoryService) *InventoryHandler {
+	return &InventoryHandler{
 		Service: service,
 	}
 }
 
-func (h *KafkaHandler) Setup(sarama.ConsumerGroupSession) error {
+func (h *InventoryHandler) Setup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
-func (h *KafkaHandler) Cleanup(sarama.ConsumerGroupSession) error {
+func (h *InventoryHandler) Cleanup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
-func (h *KafkaHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+func (h *InventoryHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for message := range claim.Messages() {
 		log.Printf("Message claimed: topic = %s, partition = %d, offset = %d", message.Topic, message.Partition, message.Offset)
 		var orderMsg OrderMessage
