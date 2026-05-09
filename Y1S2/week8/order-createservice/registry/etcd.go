@@ -30,7 +30,7 @@ func NewServiceRegistry(endpoints []string) (*ServiceRegistry, error) {
 
 func (r *ServiceRegistry) Register(serviceName, serviceAddr string, ttl int64) error {
 	r.key = "/services/" + serviceName + "/" + serviceAddr
-	r.value = serviceAddr
+	r.value = `{"Addr":"` + serviceAddr + `"}`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -50,6 +50,17 @@ func (r *ServiceRegistry) Register(serviceName, serviceAddr string, ttl int64) e
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		for {
+			select {
+			case keepAliveResp := <-r.keepAliveChan:
+				if keepAliveResp == nil {
+					return
+				}
+			}
+		}
+	}()
 
 	return nil
 }

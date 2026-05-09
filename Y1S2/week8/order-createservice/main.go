@@ -12,7 +12,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	pb "order-payment-kafka/order-createservice/pb"
+
 	"github.com/gin-gonic/gin"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/naming/resolver"
+	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/balancer/roundrobin"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -28,9 +35,37 @@ func main() {
 	}
 	defer config.Publisher.Close()
 
+	etcdClient, err := clientv3.New(clientv3.Config{
+		Endpoints: []string{"127.0.0.1:2379"},
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to etcd: %v", err)
+	}
+	defer etcdClient.Close()
+
+	etcdResolver, err := resolver.NewBuilder(etcdClient)
+	if err != nil {
+		log.Fatalf("Failed to create etcd resolver: %v", err)
+	}
+	target := "etcd:////services/inventory-grpc-service"
+
+	conn, err := grpc.NewClient(target,
+		grpc.WithResolvers(etcdResolver),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"round_robin":{}}]}`),
+	)
+
+	if err != nil {
+		log.Fatalf("Failed to connect to inventory gRPC service: %v", err)
+	}
+	defer conn.Close()
+
+	invClient := pb.NewInventoryServiceClient(conn)
+
 	orderrepository := repository.NewOrderRepository(db)
-	orderservice := service.NewOrderService(orderrepository, config.Publisher)
+	orderservice := service.NewOrderService(orderrepository, config.Publisher, invClient)
 	orderhandler := handler.NewOrderHandler(orderservice)
+
 	go func() {
 		r := gin.Default()
 		router.RegisterRoutes(r, orderhandler)
@@ -39,6 +74,7 @@ func main() {
 			log.Fatalf("Failed to run server: %v", err)
 		}
 	}()
+
 	reg, err := registry.NewServiceRegistry([]string{"127.0.0.1:2379"})
 	if err != nil {
 		log.Fatalf("Failed to connect to etcd: %v", err)

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package inventory;
+
+option go_package = "pb/inventory";
+
+service InventoryService {
+    rpc PreDeduct (PreDeductRequest) returns (PreDeductResponse);
+    rpc RollbackDeduct(RollbackDeductRequest) returns (RollbackDeductResponse);
+}
+
+message PreDeductRequest {
+    string product_id = 1;
+    int32 quantity = 2;
+}
+
+message PreDeductResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message RollbackDeductRequest {
+    string product_id = 1;
+    int32 quantity = 2;
+}
+
+message RollbackDeductResponse {
+    bool success = 1;
+    string message = 2;
+}

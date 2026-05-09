@@ -37,7 +37,7 @@ func NewServiceRegistry(endpoints []string) (*ServiceRegistry, error) {
 // Register 注册服务并维持心跳
 func (r *ServiceRegistry) Register(serviceName, serviceAddr string, ttl int64) error {
 	r.key = fmt.Sprintf("/services/%s/%s", serviceName, serviceAddr)
-	r.value = serviceAddr // 在简单场景下，value 存地址就行；复杂场景可以存 JSON 包含权重等信息
+	r.value = `{"Addr":"` + serviceAddr + `"}`
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -61,6 +61,17 @@ func (r *ServiceRegistry) Register(serviceName, serviceAddr string, ttl int64) e
 	if err != nil {
 		return fmt.Errorf("failed to keep alive: %v", err)
 	}
+
+	go func() {
+		for {
+			select {
+			case keepAliveResp := <-r.keepAliveChan:
+				if keepAliveResp == nil {
+					return
+				}
+			}
+		}
+	}()
 
 	log.Printf("Successfully registered service '%s' with address '%s' to etcd", serviceName, serviceAddr)
 

@@ -119,3 +119,24 @@ func (r *InventoryRepository) ProcessOrder(orderID uint, itemname string, nums i
 		return nil
 	})
 }
+
+func (r *InventoryRepository) PreDeduct(itemName string, nums int) error {
+	result := r.db.Model(&model.Item{}).
+		Where("name = ? AND num >= ?", itemName, nums).
+		UpdateColumn("num", gorm.Expr("num - ?", nums))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("inventory shortage or item not found")
+	}
+	return nil
+}
+
+func (r *InventoryRepository) RollbackDeduct(itemName string, nums int) error {
+	result := r.db.Model(&model.Item{}).
+		Where("name = ?", itemName).
+		UpdateColumn("num", gorm.Expr("num + ?", nums))
+
+	return result.Error
+}

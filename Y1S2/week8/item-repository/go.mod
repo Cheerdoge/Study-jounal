@@ -6,6 +6,9 @@ require (
 	github.com/IBM/sarama v1.48.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/joho/godotenv v1.5.1
+	go.etcd.io/etcd/client/v3 v3.6.11
+	google.golang.org/grpc v1.79.3
+	google.golang.org/protobuf v1.36.10
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
 )
@@ -56,7 +59,6 @@ require (
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.11 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.11 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.11 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
@@ -67,6 +69,4 @@ require (
 	golang.org/x/text v0.36.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
-	google.golang.org/grpc v1.79.3 // indirect
-	google.golang.org/protobuf v1.36.10 // indirect
 )
