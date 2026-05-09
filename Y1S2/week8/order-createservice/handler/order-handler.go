@@ -10,6 +10,7 @@ import (
 type CreateOrderRequest struct {
 	UserID uint   `json:"user_id"`
 	Item   string `json:"item"`
+	Nums   int    `json:"nums"`
 }
 
 type OrderService interface {
