@@ -20,6 +20,7 @@ type KafkaHandler struct {
 }
 
 type OrderMessage struct {
+	UserID   uint   `json:"user_id"`
 	OrderID  uint   `json:"order_id"`
 	ItemName string `json:"item_name"`
 	Nums     int    `json:"nums"`

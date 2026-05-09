@@ -21,20 +21,33 @@ type OrderService struct {
 	publisher KafkaPublisher
 }
 
+type OrderMessage struct {
+	UserID   uint   `json:"user_id"`
+	OrderID  uint   `json:"order_id"`
+	ItemName string `json:"item_name"`
+	Nums     int    `json:"nums"`
+}
+
 func NewOrderService(db OrderRepository, publisher KafkaPublisher) *OrderService {
 	return &OrderService{db: db, publisher: publisher}
 }
 
-func (s *OrderService) CreateOrder(item string) error {
+func (s *OrderService) CreateOrder(itemName string, nums int) error {
 	order := &model.Order{
-		Item:   item,
-		Status: "created",
+		ItemName: itemName,
+		Nums:     nums,
 	}
 	savedOrder, err := s.db.CreateOrder(order)
 	if err != nil {
 		return err
 	}
-	orderBytes, _ := json.Marshal(savedOrder)
+	orderMessage := OrderMessage{
+		UserID:   savedOrder.UserID,
+		OrderID:  savedOrder.ID,
+		ItemName: savedOrder.ItemName,
+		Nums:     savedOrder.Nums,
+	}
+	orderBytes, _ := json.Marshal(orderMessage)
 	if err := s.publisher.Publish("orders-created", []byte(fmt.Sprintf("%d", savedOrder.ID)), orderBytes); err != nil {
 		return err
 	}
