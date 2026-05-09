@@ -66,7 +66,10 @@ func (r *InventoryRepository) RepositoryInit() error {
 		{Name: "item3", Num: 300},
 	}
 	for _, item := range items {
-		if err := r.db.Create(&item).Error; err != nil {
+		err := r.db.Where("name = ?", item.Name).
+			Assign(model.Item{Num: item.Num}).
+			FirstOrCreate(&item).Error
+		if err != nil {
 			return err
 		}
 	}
