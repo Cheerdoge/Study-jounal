@@ -14,6 +14,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
     depends_on:
       - zookeeper
+
   etcd:
     image: quay.io/coreos/etcd:v3.5.9
     container_name: etcd-server
@@ -28,5 +29,15 @@ services:
       - --advertise-client-urls=http://0.0.0.0:2379
     volumes:
       - etcd_data:/etcd-data
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 volumes:
   etcd_data:
