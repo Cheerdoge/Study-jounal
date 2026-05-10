@@ -101,17 +101,17 @@ func (r *InventoryRepository) ProcessOrder(orderID uint, itemname string, nums i
 		if count > 0 {
 			return errors.New("order already processed")
 		}
-		var item model.Item
-		if err := tx.Where("name = ?", itemname).First(&item).Error; err != nil {
-			return err
-		}
-		if item.Num < nums {
-			return errors.New("not enough inventory")
-		}
-		item.Num -= nums
-		if err := tx.Save(&item).Error; err != nil {
-			return err
-		}
+		// var item model.Item
+		// if err := tx.Where("name = ?", itemname).First(&item).Error; err != nil {
+		// 	return err
+		// }
+		// if item.Num < nums {
+		// 	return errors.New("not enough inventory")
+		// }
+		// item.Num -= nums
+		// if err := tx.Save(&item).Error; err != nil {
+		// 	return err
+		// }
 		processedOrder := model.ProcessedOrder{OrderID: orderID}
 		if err := tx.Create(&processedOrder).Error; err != nil {
 			return err

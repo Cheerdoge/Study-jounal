@@ -11,6 +11,7 @@ func NewKafkaConsumer() (sarama.ConsumerGroup, error) {
 	config.Version = sarama.V4_2_0_0
 	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
 	config.Consumer.Offsets.Initial = sarama.OffsetOldest
+	config.Consumer.Offsets.AutoCommit.Enable = false
 
 	brokers := []string{"127.0.0.1:9092"}
 	groupId := "inventory-service-group"
